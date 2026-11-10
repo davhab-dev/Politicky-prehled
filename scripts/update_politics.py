@@ -68,7 +68,13 @@ def render_card(row):
     if row.get('importance_kind') == 'analysis':
         context = ''.join(f'<p>{p}</p>' for p in context.split('\n\n'))
         note = f'Rozbor dopadů · <a href="{escape(row["analysis_url"], quote=True)}">Podklad: {escape(row["analysis_source"])}</a>'
-    return f'<article data-category="{category}" data-published="{published}"><div class="meta"><span class="category">{label}</span><time datetime="{published}">{date}</time></div><h2><a href="{url}">{title}</a></h2><p>{summary}</p><div class="why"><b>Proč je to důležité</b>{context}<small class="small" style="display:block;margin-top:6px">{note}</small></div><div class="source"><span>Výňatek z anotace · {source}</span><a href="{url}" target="_blank" rel="noopener noreferrer">Číst původní článek ↗</a></div></article>'
+    body = f'<div class="why"><b>Proč je to důležité</b>{context}<small class="small" style="display:block;margin-top:6px">{note}</small></div>'
+    if row.get('importance_kind') == 'analysis':
+        preview = escape(row['importance'].split('\n\n')[0])
+        body = (f'<details class="why impact"><summary><b>Proč je to důležité</b><span class="excerpt">{preview}</span>'
+                '<span class="action expand">Celý rozbor</span><span class="action collapse">Sbalit rozbor</span></summary>'
+                f'{context}<small class="small">{note}</small></details>')
+    return f'<article data-category="{category}" data-published="{published}"><div class="meta"><span class="category">{label}</span><time datetime="{published}">{date}</time></div><h2><a href="{url}">{title}</a></h2><p>{summary}</p>{body}<div class="source"><span>Výňatek z anotace · {source}</span><a href="{url}" target="_blank" rel="noopener noreferrer">Číst původní článek ↗</a></div></article>'
 
 def publish(rows, now, unavailable, source_status=None):
     notes = json.loads(Path(__file__).with_name('impact_notes.json').read_text())
