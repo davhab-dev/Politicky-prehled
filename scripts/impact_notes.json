@@ -330,14 +330,14 @@
     "published_at": "2026-11-10T17:23:00+00:00"
   },
   "https://zpravy.aktualne.cz/zahranici/no-nepokakame-se-fico-a-babis-se-pustili-do-nemeckeho-ultimata-o-pujcce-ukrajine/r~aaa2948f200ae8120712d92ce507cc77/": {
-    "title": "„No nepokakáme se.“ Fico a Babiš se pustili do německého ultimáta o půjčce Ukrajině",
+    "title": "Babiš s Ficem se pustili do německého ultimáta kvůli Ukrajině. Padl i nevybíravý výraz",
     "paragraphs": [
-      "Podle Aktuálně.cz spojil Friedrich Merz podporu Německa pro příští sedmiletý rozpočet EU s účastí všech členů na financování Ukrajiny. Robert Fico odmítl slovenský podíl na další půjčce, současně ale připustil pokračování humanitární pomoci. Jeho vyjádření se tedy nevztahuje na všechny formy pomoci Ukrajině.",
-      "Pro ukrajinský rozpočet zbývá vyřešit, jak EU opatří slíbených 45 miliard eur na rok 2027. Jednou ze zvažovaných cest jsou společné dluhopisy. Pro členské státy bude podstatné, kdo ponese náklady a případné záruky. Německá podmínka může jednání o unijním rozpočtu zdržet, samotný dopis ale jeho schvalování nezastavil."
+      "Fico odmítl slovenskou účast na další půjčce Ukrajině, zatímco Babiš se k nové půjčce podle ČTK jednoznačně nevyjádřil. Český premiér odmítl především spojování ukrajinského financování s víceletým rozpočtem EU. Označení německého postupu za vydírání je Ficovo hodnocení, nikoli právní závěr.",
+      "Pro členské státy zůstává otevřené, jak zajistit slíbených 45 miliard eur pro ukrajinský rozpočet na příští rok a kdo ponese náklady. Dřívější výjimka ze záruk sama neurčuje podmínky nové pomoci. Posun bude patrný z dohody o zdroji financování a závazcích zemí; slovní spor s Merzem ještě neznamená skutečné zablokování rozpočtu."
     ],
-    "source": "Aktuálně.cz",
-    "url": "https://zpravy.aktualne.cz/zahranici/no-nepokakame-se-fico-a-babis-se-pustili-do-nemeckeho-ultimata-o-pujcce-ukrajine/r~aaa2948f200ae8120712d92ce507cc77/",
-    "published_at": "2026-11-10T18:22:44+01:00"
+    "source": "ČTK / České noviny",
+    "url": "https://www.ceskenoviny.cz/zpravy/babis-a-fico-se-ohradili-vuci-vyzve-merze-k-financni-podpore-ukrajiny/2899954",
+    "published_at": "2026-11-10T18:22:00+01:00"
   },
   "https://cnn.iprima.cz/demokraticka-republika-kongo-udelila-66-vojakum-trest-smrti-jste-zbabeli-prohlasil-soud-526767": {
     "title": "Trest smrti za zbabělost. Konžský soud odsoudil 66 vojáků, chce zlepšit morálku",
@@ -548,5 +548,15 @@
     "source": "Novinky / ČTK",
     "url": "https://www.novinky.cz/clanek/zahranicni-evropa-ve-veku-104-let-zemrela-jedna-z-hrdinek-francouzskeho-odboje-ze-druhe-sv-valky-40607940",
     "published_at": "2026-11-10T18:57:45+01:00"
+  },
+  "https://ct24.ceskatelevize.cz/clanek/domaci/studenti-vysokych-skol-demonstruji-za-verejnopravni-media-379487": {
+    "title": "Studenti vysokých škol napříč Českem vyjádřili podporu ČT a ČRo",
+    "paragraphs": [
+      "Studentské protesty požadují stažení návrhu rušícího poplatky ČT a ČRo a otevření odborné debaty. Samotné demonstrace návrh nezastavily: Babiš podle článku stažení odmítá, připouští však jednání o podobě předlohy. Obavy studentů z politického ovlivňování médií je proto třeba odlišit od již prokázaného dopadu dosud projednávané změny.",
+      "Pro diváky, posluchače a zaměstnance médií bude rozhodující výsledný způsob financování a záruky jeho předvídatelnosti. Konkrétní posun ukážou změny textu návrhu a další parlamentní hlasování. Požadavky na podporu školství, kultury či odvolání některých představitelů rozšiřují protest, ale zpráva nedokládá, že by vláda některému z těchto požadavků již vyhověla."
+    ],
+    "source": "ČT24",
+    "url": "https://ct24.ceskatelevize.cz/clanek/domaci/studenti-vysokych-skol-demonstruji-za-verejnopravni-media-379487",
+    "published_at": "2026-11-10T16:19:59+00:00"
   }
 }
