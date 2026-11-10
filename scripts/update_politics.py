@@ -46,21 +46,32 @@ def select(rows):
         tokens.append(terms)
     return chosen
 
+def with_context(row, notes):
+    note = notes.get(row['url'])
+    if note and note['title'] == row['title']:
+        return dict(row, importance='\n\n'.join(note['paragraphs']), importance_kind='analysis',
+                    analysis_source=note['source'], analysis_url=note['url'])
+    return dict(row, importance=row.get('importance') or importance(row), importance_kind='possible_impact')
+
 def render_card(row):
     title, summary, source, category, published, url = (escape(row[k], quote=True) for k in ['title','summary','source','category','published_at','url'])
     label = 'Domácí politika' if category == 'domaci' else 'Zahraniční politika'
     date = datetime.fromisoformat(row['published_at']).astimezone(ZoneInfo('Europe/Prague')).strftime('%d. %m. %Y · %H:%M')
     context = escape(row.get("importance") or importance(row), quote=True)
     note = "Možný dopad · odhad" if row.get("importance_kind") == "possible_impact" else "Tematický kontext"
+    if row.get('importance_kind') == 'analysis':
+        context = ''.join(f'<p>{p}</p>' for p in context.split('\n\n'))
+        note = f'Rozbor dopadů · <a href="{escape(row["analysis_url"], quote=True)}">Podklad: {escape(row["analysis_source"])}</a>'
     return f'<article data-category="{category}" data-published="{published}"><div class="meta"><span class="category">{label}</span><time datetime="{published}">{date}</time></div><h2><a href="{url}">{title}</a></h2><p>{summary}</p><div class="why"><b>Proč je to důležité</b>{context}<small class="small" style="display:block;margin-top:6px">{note}</small></div><div class="source"><span>Výňatek z anotace · {source}</span><a href="{url}" target="_blank" rel="noopener noreferrer">Číst původní článek ↗</a></div></article>'
 
 def publish(rows, now, unavailable, source_status=None):
-    rows = [dict(row, importance=row.get("importance") or importance(row), importance_kind="possible_impact") for row in rows]
+    notes = json.loads(Path(__file__).with_name('impact_notes.json').read_text())
+    rows = [with_context(row, notes) for row in rows]
     data = dict(updated_at=now.isoformat(), window_hours=24, articles=rows, unavailable_sources=unavailable, sources=source_status or [])
     page = (DEST/'index.html').read_text()
     catalog_payload = json.dumps(CATALOG, ensure_ascii=False).replace('<', '\\u003c')
     page = re.sub(r'(<script id="source-config" type="application/json">).*?(</script>)', lambda m:m[1]+catalog_payload+m[2], page, flags=re.S)
-    page, count = re.subn(r'<!-- NEWS START -->.*?<!-- NEWS END -->', '<!-- NEWS START -->'+''.join(map(render_card, rows))+'<!-- NEWS END -->', page, flags=re.S)
+    page, count = re.subn(r'<!-- NEWS START -->.*?<!-- NEWS END -->', lambda _: '<!-- NEWS START -->'+''.join(map(render_card, rows))+'<!-- NEWS END -->', page, flags=re.S)
     assert count == 1
     local = now.astimezone(ZoneInfo('Europe/Prague'))
     page = re.sub(r'(<strong id="editionDate">).*?(</strong>)', lambda m:m[1]+local.strftime('%d. %m. %Y')+m[2], page)
