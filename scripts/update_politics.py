@@ -51,10 +51,11 @@ def render_card(row):
     label = 'Domácí politika' if category == 'domaci' else 'Zahraniční politika'
     date = datetime.fromisoformat(row['published_at']).astimezone(ZoneInfo('Europe/Prague')).strftime('%d. %m. %Y · %H:%M')
     context = escape(row.get("importance") or importance(row), quote=True)
-    return f'<article data-category="{category}" data-published="{published}"><div class="meta"><span class="category">{label}</span><time datetime="{published}">{date}</time></div><h2><a href="{url}">{title}</a></h2><p>{summary}</p><div class="why"><b>Proč je to důležité</b>{context}<small class="small" style="display:block;margin-top:6px">Tematický kontext</small></div><div class="source"><span>Výňatek z anotace · {source}</span><a href="{url}" target="_blank" rel="noopener noreferrer">Číst původní článek ↗</a></div></article>'
+    note = "Možný dopad · odhad" if row.get("importance_kind") == "possible_impact" else "Tematický kontext"
+    return f'<article data-category="{category}" data-published="{published}"><div class="meta"><span class="category">{label}</span><time datetime="{published}">{date}</time></div><h2><a href="{url}">{title}</a></h2><p>{summary}</p><div class="why"><b>Proč je to důležité</b>{context}<small class="small" style="display:block;margin-top:6px">{note}</small></div><div class="source"><span>Výňatek z anotace · {source}</span><a href="{url}" target="_blank" rel="noopener noreferrer">Číst původní článek ↗</a></div></article>'
 
 def publish(rows, now, unavailable, source_status=None):
-    rows = [dict(row, importance=row.get("importance") or importance(row), importance_kind="topic_context") for row in rows]
+    rows = [dict(row, importance=row.get("importance") or importance(row), importance_kind="possible_impact") for row in rows]
     data = dict(updated_at=now.isoformat(), window_hours=24, articles=rows, unavailable_sources=unavailable, sources=source_status or [])
     page = (DEST/'index.html').read_text()
     catalog_payload = json.dumps(CATALOG, ensure_ascii=False).replace('<', '\\u003c')

@@ -70,16 +70,26 @@ class UpdateTests(unittest.TestCase):
 
     def test_context_distinguishes_proposal_from_effective_law(self):
         context = importance(dict(title='Vláda souhlasila s novelou zákona', category='domaci'))
-        self.assertIn('návrh, schválení', context)
+        self.assertIn('Pokud se návrh schválí', context)
 
     def test_specific_context_precedes_generic_politics(self):
         context = importance(dict(title='Vláda zavede povinné e-žádanky', category='domaci'))
         self.assertIn('pacientů', context)
-        self.assertIn('ještě nemusí znamenat', context)
+        self.assertIn('Pokud se povinnost zavede', context)
 
     def test_allegation_is_not_presented_as_proven_guilt(self):
         context = importance(dict(title='FBI vyšetřuje podezření ze špionáže', category='svet'))
-        self.assertIn('neprokazují vinu', context)
+        self.assertIn('vinu neprokazuje', context)
+
+    def test_summary_supplies_specific_anniversary_context(self):
+        result = importance(dict(title='Premiér odjíždí do Izraele', summary='Babiš se nezúčastní oslav 17. listopadu.', category='domaci'))
+        self.assertIn('Neúčast premiéra může', result)
+        self.assertIn('důvěru veřejnosti', result)
+
+    def test_impact_mentions_people_affected_by_electronic_referrals(self):
+        result = importance(dict(title='Vláda projedná povinné e-žádanky', category='domaci'))
+        self.assertIn('pacientům', result)
+        self.assertIn('Ordinace', result)
 
 if __name__ == '__main__':
     unittest.main()

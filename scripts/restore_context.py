@@ -1,34 +1,43 @@
-"""Topic context for the automated digest; never a second source or prediction."""
+"""Brief conditional impact scenarios derived from the reported topic."""
 import re
 
 RULES = [
-    (r'oslav.*izrael|listopad.*izrael', 'Termín zahraniční návštěvy ukazuje, jak premiér rozděluje pozornost mezi mezinárodní jednání a připomínku demokratických změn v Česku.'),
-    (r'špion', 'Případ propojuje národní bezpečnost s mezinárodními vztahy. Podezření ani zahájené vyšetřování samy o sobě neprokazují vinu.'),
-    (r'plakát|kauz.*spd|spd.*soud', 'Jde o hranice politické kampaně a svobody projevu. Pro právní výsledek je podstatné rozhodnutí soudu, nikoli názory komentátorů.'),
-    (r'letoun|leteck.*základ|bombard', 'Rozmístění vojenských letadel souvisí s bezpečností základen, ochranou spojenců a možnostmi dalšího vojenského působení.'),
-    (r'volb.*neplatn|hlasování.*neplatn|volit znovu', 'Soudní přezkum chrání důvěryhodnost voleb. Neplatné hlasování může změnit, kdy a jak obec získá řádně zvolené vedení.'),
-    (r'uměl.*inteligenc|\bai\b|openai', 'Dohled nad umělou inteligencí řeší odpovědnost technologických firem a ochranu veřejnosti. Rozhodující bude konkrétní podoba a účinnost pravidel.'),
-    (r'manžel.*okupac|okupac.*rodin', 'Příběh ukazuje dlouhodobé dopady okupace na civilisty a rozdělené rodiny, které se v souhrnných údajích o válce snadno ztrácejí.'),
-    (r'hraniční.*zdi|hranic.*mexik|zdi.*park', 'Spor propojuje migrační politiku s ochranou území a pravomocemi vlády. Soudní rozhodnutí určuje, jaké kroky smí administrativa podniknout.'),
-    (r'průzkum', 'Přesnost průzkumů ovlivňuje očekávání veřejnosti i strategii stran. Průzkum je odhad zatížený nejistotou, nikoli náhrada skutečného volebního výsledku.'),
-    (r'unijní rozpočet|rozpočet.*ukrajin', 'Jednání propojuje financování Evropské unie s podporou Ukrajiny. Požadavek jedné vlády ještě neznamená dohodu všech členských států.'),
-    (r'ocenil zachránce|záchranářsk', 'Ocenění upozorňuje na práci záchranářů a občanskou pomoc. Jde především o společenskou a symbolickou roli prezidenta.'),
-    (r'ostřelov|kyjevsk.*čtvrť', 'Reportáž přibližuje dopady války na každodenní život civilistů a fungování měst. Doplňuje vojenské zprávy o pohled místních obyvatel.'),
-    (r'pomoc.*izrael|izrael.*pomoc', 'Složení amerického Kongresu může ovlivnit podobu podpory Izraele i dohled nad zahraniční politikou. Možná změna však ještě není přijatým rozhodnutím.'),
-    (r'kybernet', 'Vedení kybernetických a informačních sil souvisí s obranou státu proti digitálním hrozbám. Personální změna sama o sobě neprokazuje změnu obranné strategie.'),
-    (r'macinka.*hokej|hokej.*macinka', 'Výroky ministra zahraničí mají vedle domácí debaty i diplomatický rozměr. Je důležité rozlišovat jeho vyjádření od formálních kroků státu.'),
-    (r'e-žádank|elektronick.*žádank', 'Digitalizace žádanek se týká práce lékařů i přístupu pacientů k vyšetření. Souhlas vlády s návrhem ještě nemusí znamenat, že povinnost již platí.'),
-    (r'zákon|novel|legislativ', 'Legislativní změna může ovlivnit práva a povinnosti lidí nebo institucí. Je nutné rozlišovat návrh, schválení a datum, kdy pravidla skutečně začnou platit.'),
-    (r'volb|voleb|mandát|koalic|starost|zastupitel', 'Výsledek voleb a navazující jednání určují, kdo bude rozhodovat o veřejných penězích a prioritách. Samotný volební zisk ještě nezaručuje účast na vedení.'),
-    (r'rozpoč|daně|důchod|dávk', 'Rozhodování o veřejných financích se promítá do dostupnosti služeb i peněz domácností. Konkrétní dopad závisí na schválené podobě opatření.'),
-    (r'příměří|mírov|válk|ukrajin|gaza|írán', 'Vývoj souvisí s bezpečností obyvatel a možnostmi diplomatického řešení. Oznámení nebo návrh je třeba odlišovat od dohody, která se skutečně dodržuje.'),
-    (r'prezident|premiér|ministr|vlád|diplomat', 'Zpráva pomáhá sledovat priority a odpovědnost představitelů státu. Pro praktický dopad je důležité, které výroky se promění v konkrétní rozhodnutí.'),
+    (r'špion|špión', 'Pokud se podezření potvrdí, může následovat trestní stíhání a přísnější ochrana citlivých technologií či informací. Samotné vyšetřování vinu neprokazuje.'),
+    (r'plakát|kauz.*spd|spd.*soud', 'Rozhodnutí soudu může ovlivnit podobu dalších volebních kampaní a to, kde bude hranice mezi politickou kritikou a podněcováním nenávisti.'),
+    (r'volb.*neplatn|hlasování.*neplatn|neplatn.*hlasování|volit znovu', 'Opakování hlasování může oddálit vznik vedení obce a změnit rozdělení mandátů. Do vyjasnění výsledku se mohou zdržet některá místní rozhodnutí.'),
+    (r'e-žádank|elektronick.*žádank', 'Pokud se povinnost zavede, může pacientům zjednodušit předávání žádanek mezi lékaři. Ordinace ale mohou potřebovat úpravy softwaru a nové pracovní postupy.'),
+    (r'kybernet|hacktiv|hacke|kyberš', 'Další útoky mohou narušit služby nebo vést k úniku dat. Pro dotčené instituce to může znamenat náklady na obnovu provozu a posílení zabezpečení.'),
+    (r'uměl.*inteligenc|\bai\b|openai', 'Přísnější pravidla mohou zvýšit odpovědnost technologických firem a ochranu uživatelů. Mohou ale také zpomalit zavádění některých služeb a zvýšit náklady na jejich provoz.'),
+    (r'průzkum|median|volební model', 'Pokud se trend udrží, může změnit vyjednávací sílu stran a složení možných koalic. Samotný průzkum ale neurčuje výsledek příštích voleb.'),
+    (r'unijní rozpočet|rozpočet.*ukrajin', 'Spor může oddálit dohodu o evropském rozpočtu nebo pomoci Ukrajině. Kompromis může ovlivnit, kolik peněz poskytnou jednotlivé státy a za jakých podmínek.'),
+    (r'hraniční.*zdi|hranic.*mexik|zdi.*park', 'Pokračování stavby může změnit situaci v příhraničí a zasáhnout chráněná území. Další soudní spory mohou ovlivnit tempo výstavby i její náklady.'),
+    (r'pomoc.*izrael|izrael.*pomoc', 'Změna americké podpory může ovlivnit možnosti izraelské vlády i její vyjednávání. Případné podmínky pomoci by mohly zvýšit tlak na změnu jejího postupu.'),
+    (r'letoun|leteck.*základ|bombard', 'Přesuny letadel mohou změnit dostupnost vojenské podpory a ochranu základen. Při dalším růstu napětí mohou spojenci upravovat rozmístění sil i bezpečnostní opatření.'),
+    (r'ostřelov|ruském útoku|útok.*ukrajinsk|kyjevsk.*čtvrť', 'Další útoky mohou zhoršit bezpečnost civilistů a narušit dopravu, dodávky energie či fungování měst. Mohou také zvýšit potřebu evakuací a humanitární pomoci.'),
+    (r'manžel.*okupac|okupac.*rodin', 'Pokračující okupace může dál komplikovat návrat obyvatel a slučování rodin. Pro postižené domácnosti to může znamenat delší nejistotu ohledně bydlení a obživy.'),
+    (r'oslab.*rusk|rusk.*sport|hokej|sportovní arbitráž', 'Spor může ovlivnit účast sportovců na mezinárodních soutěžích a vztahy mezi svazy. Diplomatické reakce mohou přenést téma i do jednání mezi státy.'),
+    (r'ocenil zachránce|záchranářsk', 'Zviditelnění oceněných může posílit zájem o první pomoc a podporu záchranářů. Přímá změna pravidel nebo financování z ocenění sama nevyplývá.'),
+    (r'příměří|mírov|jednání.*ukončení|rozhovory.*ukrajin|jednání.*válk|bezpečnostní rámec', 'Dohoda by mohla omezit boje a otevřít prostor pro bezpečnostní záruky či obnovu země. Pokud jednání selžou, nejistota pro obyvatele i spojence může pokračovat.'),
+    (r'zdravot|pojišťovn|nemocnic', 'Změna může ovlivnit dostupnost péče, financování zdravotnictví nebo práci zdravotníků. Rozhodující bude schválená podoba opatření a jeho zavedení do praxe.'),
+    (r'energie|energetik|elektřin|plyn', 'Výsledek může ovlivnit jistotu dodávek a náklady na energie pro domácnosti či firmy. Konkrétní dopad závisí na uzavřených dohodách a podmínkách jejich plnění.'),
+    (r'rozpoč|daně|důchod|dávk|veřejné finance', 'Přijatá změna může ovlivnit příjmy domácností nebo peníze na veřejné služby. Dokud není schválená její konečná podoba, dopad nelze určit přesně.'),
+    (r'zákon|novel|legislativ', 'Pokud se návrh schválí, mohou se změnit práva nebo povinnosti dotčených lidí a institucí. Praktický dopad bude záviset na konečném znění a termínu účinnosti.'),
+    (r'volb|voleb|mandát|koalic|starost|zastupitel', 'Vývoj může změnit složení vedení a priority při rozhodování o veřejných penězích. Výsledek bude záviset na dalších jednáních a konkrétních dohodách.'),
+    (r'válk|ukrajin|gaza|írán', 'Další vývoj může ovlivnit bezpečnost obyvatel, humanitární situaci i vztahy mezi státy. Zhoršení situace může zvýšit nároky na pomoc a tlak na diplomatická jednání.'),
 ]
 
 def importance(row):
-    for pattern, context in RULES:
-        if re.search(pattern, row['title'], re.I):
-            return context
-    return ('Téma je součástí domácí politické debaty; pro veřejnost je podstatné, koho se týká a jaké konkrétní kroky příslušné instituce podniknou.'
+    title = row['title']
+    text = title + ' ' + row.get('summary', '')
+    # This combination is specific enough to separate the domestic anniversary
+    # dispute from unrelated diplomatic visits mentioned in the same feed.
+    if re.search(r'17\.?\s*listopad', text, re.I) and re.search(r'babiš|premiér', text, re.I):
+        return 'Neúčast premiéra může zesílit kritiku opozice a přesunout pozornost od oslav k politickému sporu. Dopad na důvěru veřejnosti bude záviset i na dalším vysvětlení vlády.'
+    for pattern, impact in RULES:
+        if re.search(pattern, text, re.I):
+            return impact
+    if re.search(r'prezident|premiér|ministr|vlád|diplomat', text, re.I):
+        return 'Pokud na vyjádření navážou konkrétní kroky, mohou změnit priority vlády nebo vztahy s jejími partnery. Bez následného rozhodnutí může dopad zůstat hlavně v politické debatě.'
+    return ('Další postup může ovlivnit rozhodování příslušných úřadů a lidí, kterých se téma týká. Z dostupného popisu nelze konkrétnější dopad spolehlivě odhadnout.'
             if row['category'] == 'domaci' else
-            'Zpráva doplňuje obraz mezinárodního dění. Její širší význam závisí na dalších krocích zúčastněných států a institucí.')
+            'Další reakce mohou ovlivnit vztahy mezi zúčastněnými zeměmi nebo institucemi. Z dostupného popisu nelze konkrétnější dopad spolehlivě odhadnout.')
