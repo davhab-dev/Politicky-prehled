@@ -12,7 +12,7 @@ Publikační workflow v repozitáři webu uloží nové HTML a JSON a výslovně
 
 Ověření: `python -m unittest discover -s scripts -p 'test_update_politics.py'`. Ruční obnova: `python scripts/update_politics.py` (Python 3.12+, curl).
 
-Rámeček „Proč je to důležité“ obsahuje stručný podmíněný odhad možného dalšího vývoje a dopadů na konkrétní skupiny. Pravidla v `scripts/restore_context.py` pracují s titulkem i anotací. Odhad je uložen v poli `importance`, s typem `possible_impact`, a označen „Možný dopad · odhad“. Nejde o další potvrzené tvrzení zdroje ani jistou předpověď. Pokud chybí konkrétní podklad, vysvětlení přizná omezenou možnost odhadu. Starší archivní vydání zachovávají původní označení a obsah.
+Rámeček „Proč je to důležité“ zobrazuje konkrétní rozbor a odkaz na ověřený podklad. Hodinová redakční úloha zpracuje všechny nové články posledního vydání, doplní záznamy do `scripts/impact_notes.json` a promítne je do živých dat a HTML pomocí `python scripts/apply_impact_notes.py cesta/k/politicky-prehled`. Nový článek čeká na ověření s viditelným stavem. Shoda URL a titulku umožňuje použít hotový rozbor i při dalším sběru. Dříve vydané archivní snímky zachovávají původní obsah. Čas poslední kontroly zpráv se při doplnění komentáře nemění.
 
 Rozbalovací Seznam zdrojů používá stejný schválený katalog jako aktualizační skript. Výběr vychází z dohledatelné redakce, redakčních standardů a veřejných podkladů NFNZ (https://www.nfnz.cz/rating-medii/, https://www.nfnz.cz/dezinformacni-a-konspiracni-media/), ověřeno 10. 11. 2026. Nejde o automatický slib pokrytí každého českého webu ani o záruku správnosti všech tvrzení. Nové domény vyžadují výslovné zařazení; přesměrování mimo schválené domény se odmítá.
 

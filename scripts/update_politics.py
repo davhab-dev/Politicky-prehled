@@ -10,7 +10,6 @@ import json
 import re
 import subprocess
 import xml.etree.ElementTree as ET
-from restore_context import importance
 from edition_archive import archive_edition
 from source_reader import CATALOG, HOSTS, fetch, parse_feed as read_feed, inspect_article
 
@@ -48,17 +47,24 @@ def select(rows):
 
 def with_context(row, notes):
     note = notes.get(row['url'])
-    if note and note['title'] == row['title']:
+    if (note and note['title'] == row['title']
+            and urlparse(note['url']).scheme == 'https' and urlparse(note['url']).hostname in HOSTS
+            and note['paragraphs'] and all(p.strip() for p in note['paragraphs'])):
         return dict(row, importance='\n\n'.join(note['paragraphs']), importance_kind='analysis',
                     analysis_source=note['source'], analysis_url=note['url'])
-    return dict(row, importance=row.get('importance') or importance(row), importance_kind='possible_impact')
+    if row.get('importance_kind') == 'analysis' and not note:
+        return row
+    clean = {k: v for k, v in row.items() if k not in ('analysis_source', 'analysis_url')}
+    return dict(clean, importance='Čeká na zpracování a ověření zdrojů.', importance_kind='pending')
 
 def render_card(row):
     title, summary, source, category, published, url = (escape(row[k], quote=True) for k in ['title','summary','source','category','published_at','url'])
     label = 'Domácí politika' if category == 'domaci' else 'Zahraniční politika'
     date = datetime.fromisoformat(row['published_at']).astimezone(ZoneInfo('Europe/Prague')).strftime('%d. %m. %Y · %H:%M')
-    context = escape(row.get("importance") or importance(row), quote=True)
+    context = escape(row.get("importance") or "Čeká na zpracování a ověření zdrojů.", quote=True)
     note = "Možný dopad · odhad" if row.get("importance_kind") == "possible_impact" else "Tematický kontext"
+    if row.get('importance_kind') == 'pending':
+        note = 'Stav rozboru'
     if row.get('importance_kind') == 'analysis':
         context = ''.join(f'<p>{p}</p>' for p in context.split('\n\n'))
         note = f'Rozbor dopadů · <a href="{escape(row["analysis_url"], quote=True)}">Podklad: {escape(row["analysis_source"])}</a>'
