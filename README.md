@@ -27,3 +27,9 @@ Z každé redakce se kontroluje nejvýše osm aktuálních politických kandidá
 - `data.json`, `archive/`: výchozí snímek dat při osamostatnění projektu; živá data a novější archiv vznikají v publikačním repozitáři webu.
 
 Upravený kód se na veřejném webu projeví při příštím úspěšném hodinovém běhu. Okamžité nasazení lze spustit ručně v Actions repozitáře webu. Není potřeba osobní přístupový token ani další kopie automatizace.
+
+## Vyhledávání
+
+Zadání dotazu prohledává aktuální data i všechna uložená vydání z `archive/index.json`, bez 24hodinového omezení. Archiv se načítá až při hledání, čtyřmi souběžnými požadavky, a během návštěvy zůstává v paměti. Výpadek je viditelný a lze jej opakovat. Hledá se v titulku, shrnutí, celém rozboru a názvu zdroje; nikoli v plném textu externího článku. Bez diakritiky a velikosti písmen, se základním porovnáním koncovek (nikoli úplnou českou lemmatizací); Letná/Letné/Letnou mají výslovnou shodu bez záměny s „letní“. Více slov musí být nalezeno v témže článku. Shodné URL napříč vydáními se slučují, přednost má nejlépe odpovídající verze, při shodě nejnovější. Lze řadit podle relevance nebo data vydání a filtrovat rubriku. Zrušení hledání vrací vybrané vydání. Tematické štítky ani externí plné texty se zatím neindexují.
+
+Regresní kontrola vyhledávání: `node scripts/test_search.cjs` (bez dalších závislostí).
