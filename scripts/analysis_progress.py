@@ -50,9 +50,13 @@ def transition(state, rows, action, url=None, now=None):
     pending=[[r['url'],r['title']] for r in rows if r.get('importance_kind')=='pending']
     key=next((k for k in pending if k[0]==url),None)
     if action=='start':
-        state.update(active=True,queue=pending,needs_sources=[],current=None)
+        state.update(active=True,queue=pending,needs_sources=[],current=None,
+                     cycle=dict(started_at=now.isoformat(), initial_pending=len(pending),
+                                completed=[], deferred=[], status='running'))
     elif action=='begin':
         if key is None: raise ValueError('Article is not pending')
+        if not state.get('active'): raise ValueError('Start the cycle before beginning an article')
+        if state.get('current'): raise ValueError('Finish or defer the current article first')
         state['current']={'key':key,'started_at':now.isoformat()}
     elif action in ('finish','defer'):
         current=state.get('current')
@@ -64,9 +68,17 @@ def transition(state, rows, action, url=None, now=None):
             if 1<=seconds<=3600: state['samples_seconds']=(state.get('samples_seconds',[])+[seconds])[-50:]
         else:
             state.setdefault('needs_sources',[]).append(current['key'])
+        cycle=state.setdefault('cycle', {})
+        cycle.setdefault('completed' if action=='finish' else 'deferred', []).append(current['key'])
         state['queue']=[k for k in state.get('queue',[]) if k!=current['key']]
         state['current']=None
-    elif action=='stop': state.update(active=False,current=None)
+    elif action=='stop':
+        remaining=[k for k in pending if k not in state.get('needs_sources',[])]
+        cycle=state.setdefault('cycle', {})
+        cycle.update(finished_at=now.isoformat(), remaining=len(remaining),
+                     status='incomplete' if remaining else ('awaiting_sources' if pending else 'complete'))
+        # Never discard unprocessed work or confuse a stopped worker with success.
+        state.update(active=False,current=None,queue=remaining)
     else: raise ValueError('Unknown action')
     state['heartbeat']=now.isoformat()
     return state
@@ -76,10 +88,19 @@ if __name__=='__main__':
     parser.add_argument('folder',type=Path)
     parser.add_argument('action',choices=['start','begin','finish','defer','stop'])
     parser.add_argument('--url')
+    parser.add_argument('--check', action='store_true', help='Validate the saved cycle outcome without changing files')
     args=parser.parse_args()
     path=args.folder/'analysis-progress.json'
     state=json.loads(path.read_text()) if path.exists() else {}
     rows=json.loads((args.folder/'data.json').read_text())['articles']
+    if args.check:
+        remaining=[r for r in rows if r.get('importance_kind')=='pending'
+                   and [r['url'],r['title']] not in state.get('needs_sources',[])]
+        status=state.get('cycle',{}).get('status','not_started')
+        print(json.dumps(dict(status=status, remaining=len(remaining),
+            completed=len(state.get('cycle',{}).get('completed',[])),
+            deferred=len(state.get('cycle',{}).get('deferred',[]))),ensure_ascii=False))
+        raise SystemExit(2 if remaining or state.get('active') or status not in ('complete','awaiting_sources') else 0)
     state=transition(state,rows,args.action,args.url)
     path.write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
     from apply_impact_notes import apply_notes

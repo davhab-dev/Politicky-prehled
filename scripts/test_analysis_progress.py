@@ -56,3 +56,34 @@ class CacheTests(unittest.TestCase):
             apply_notes(folder,{})
             self.assertEqual(json.loads((folder/'data.json').read_text()),data)
             self.assertIn('Čas dokončení zatím nelze', (folder/'index.html').read_text())
+
+class CompletionTests(unittest.TestCase):
+    def test_collect_only_is_incomplete_and_keeps_queue(self):
+        rows=[dict(url='https://a',title='A',importance_kind='pending')]
+        state=transition({},rows,'start')
+        transition(state,rows,'stop')
+        self.assertEqual(state['cycle']['status'],'incomplete')
+        self.assertEqual(state['queue'],[['https://a','A']])
+    def test_completion_and_defer_are_distinct(self):
+        rows=[dict(url='https://a',title='A',importance_kind='pending')]
+        state=transition({},rows,'start')
+        transition(state,rows,'begin','https://a')
+        transition(state,rows,'defer','https://a')
+        transition(state,rows,'stop')
+        self.assertEqual(state['cycle']['status'],'awaiting_sources')
+        self.assertEqual(rows[0]['importance_kind'],'pending')
+        self.assertEqual(len(state['cycle']['deferred']),1)
+    def test_verified_finish_can_complete(self):
+        rows=[dict(url='https://a',title='A',importance_kind='pending')]
+        state=transition({},rows,'start')
+        transition(state,rows,'begin','https://a')
+        rows[0]['importance_kind']='analysis'
+        transition(state,rows,'finish','https://a')
+        transition(state,rows,'stop')
+        self.assertEqual(state['cycle']['status'],'complete')
+        self.assertEqual(len(state['cycle']['completed']),1)
+    def test_unstarted_and_overlapping_work_rejected(self):
+        rows=[dict(url='https://a',title='A',importance_kind='pending')]
+        with self.assertRaises(ValueError):transition({},rows,'begin','https://a')
+        state=transition({},rows,'start');transition(state,rows,'begin','https://a')
+        with self.assertRaises(ValueError):transition(state,rows,'begin','https://a')

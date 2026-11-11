@@ -8,6 +8,8 @@ import shutil
 import tempfile
 from pathlib import Path
 import update_politics
+from analysis_progress import transition
+from apply_impact_notes import apply_notes
 
 def collect(folder):
     folder=Path(folder).resolve()
@@ -27,6 +29,12 @@ def collect(folder):
             update_politics.DEST=stage
             update_politics.main()
         finally: update_politics.DEST=old
+        # Register the real queue in the SAME edition; publication is not completion.
+        rows=json.loads((stage/'data.json').read_text())['articles']
+        state=transition(state, rows, 'start')
+        progress.write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
+        notes=json.loads((root/'scripts/impact_notes.json').read_text())
+        apply_notes(stage, notes)
         shutil.copytree(stage,folder,dirs_exist_ok=True)
 
 if __name__=='__main__':
