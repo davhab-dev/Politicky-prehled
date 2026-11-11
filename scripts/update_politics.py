@@ -11,6 +11,7 @@ import re
 import subprocess
 import xml.etree.ElementTree as ET
 from edition_archive import archive_edition
+from analysis_progress import waiting_message, decorate
 from source_reader import CATALOG, HOSTS, fetch, parse_feed as read_feed, inspect_article
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -64,7 +65,7 @@ def render_card(row):
     context = escape(row.get("importance") or "Čeká na zpracování a ověření zdrojů.", quote=True)
     note = "Možný dopad · odhad" if row.get("importance_kind") == "possible_impact" else "Tematický kontext"
     if row.get('importance_kind') == 'pending':
-        note = 'Stav rozboru'
+        note = waiting_message(row)
     if row.get('importance_kind') == 'analysis':
         context = ''.join(f'<p>{p}</p>' for p in context.split('\n\n'))
         note = f'Rozbor dopadů · <a href="{escape(row["analysis_url"], quote=True)}">Podklad: {escape(row["analysis_source"])}</a>'
@@ -78,7 +79,13 @@ def render_card(row):
 
 def publish(rows, now, unavailable, source_status=None):
     notes = json.loads(Path(__file__).with_name('impact_notes.json').read_text())
-    rows = [with_context(row, notes) for row in rows]
+    previous_path = DEST / 'data.json'
+    previous_rows = json.loads(previous_path.read_text()).get('articles', []) if previous_path.exists() else []
+    cached = {(r['url'], r['title']): r for r in previous_rows if r.get('importance_kind') == 'analysis'}
+    rows = [with_context(dict(row, **{k:v for k,v in cached.get((row['url'],row['title']), {}).items() if k.startswith('analysis_') or k in ('importance','importance_kind')}), notes) for row in rows]
+    progress_path = DEST / 'analysis-progress.json'
+    progress = json.loads(progress_path.read_text()) if progress_path.exists() else {}
+    rows = decorate(rows, progress)
     data = dict(updated_at=now.isoformat(), window_hours=24, articles=rows, unavailable_sources=unavailable, sources=source_status or [])
     page = (DEST/'index.html').read_text()
     catalog_payload = json.dumps(CATALOG, ensure_ascii=False).replace('<', '\\u003c')

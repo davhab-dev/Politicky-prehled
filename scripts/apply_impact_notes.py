@@ -9,6 +9,7 @@ import re
 from pathlib import Path
 
 from update_politics import render_card, with_context
+from analysis_progress import decorate
 
 
 def apply_notes(folder, notes):
@@ -20,8 +21,9 @@ def apply_notes(folder, notes):
     if not current or json.loads(current[1]) != data:
         raise ValueError('HTML and JSON belong to different editions')
     rows = [with_context(row, notes) for row in data['articles']]
-    if rows == data['articles']:
-        return
+    progress_path = folder / 'analysis-progress.json'
+    state = json.loads(progress_path.read_text()) if progress_path.exists() else {}
+    rows = decorate(rows, state)
     data['articles'] = rows
     payload = json.dumps(data, ensure_ascii=False).replace('<', r'\u003c')
     page = page[:current.start(1)] + payload + page[current.end(1):]
