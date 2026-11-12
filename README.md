@@ -1,5 +1,7 @@
 # Politický přehled
 
+> **Aktuální provoz od 12. 11. 2026:** hodinový sběr a publikaci provádí bez AI GitHub Actions v repozitáři `davhab-dev/davhab-dev.github.io`, workflow `.github/workflows/politicky-prehled.yml` (cron v minutě :12). ChatGPT vytváří pouze rozbory v 06:00 a 18:00 Europe/Prague, nejvýše osm událostí za cyklus; výsledky ukládá do `scripts/impact_notes.json`. Publikují se při dalším hodinovém sběru. Aktuální pokyny jsou v `scripts/EDITORIAL_CYCLE.md`. Starší odstavce README o hodinové AI úloze popisují historický provoz.
+
 Veřejná stránka: https://davhab.com/politicky-prehled/
 
 Tento repozitář je samostatným zdrojem aplikace. Kontroly kódu běží v `.github/workflows/check.yml`. Veřejnou adresu zajišťuje repozitář `davhab-dev/davhab-dev.github.io`. Pravidelný sběr, okamžité zveřejnění článků a následné rozbory řídí jediná hodinová úloha ChatGPT podle postupu níže. GitHub workflow slouží jen k ruční obnově.
