@@ -8,7 +8,6 @@ import shutil
 import tempfile
 from pathlib import Path
 import update_politics
-from analysis_progress import transition
 from apply_impact_notes import apply_notes
 
 def collect(folder):
@@ -22,7 +21,8 @@ def collect(folder):
         # A previous worker must never advertise stale estimates for a new cycle.
         progress=stage/'analysis-progress.json'
         state=json.loads(progress.read_text()) if progress.exists() else {}
-        state.update(active=False,current=None,queue=[],needs_sources=[])
+        # Collection never starts an AI worker or discards measured samples.
+        state.update(active=False,current=None)
         progress.write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
         old=update_politics.DEST
         try:
@@ -31,7 +31,12 @@ def collect(folder):
         finally: update_politics.DEST=old
         # Register the real queue in the SAME edition; publication is not completion.
         rows=json.loads((stage/'data.json').read_text())['articles']
-        state=transition(state, rows, 'start')
+        # Preserve pending articles for the next independent editorial session.
+        pending=[[r['url'],r['title']] for r in rows if r.get('importance_kind')=='pending']
+        old_sources=state.get('needs_sources', [])
+        state['queue']=pending
+        state['needs_sources']=[k for k in old_sources if k in pending]
+        state['cycle']=dict(status='awaiting_analysis',initial_pending=len(pending),completed=[],deferred=[],remaining=len(pending))
         progress.write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n')
         notes=json.loads((root/'scripts/impact_notes.json').read_text())
         apply_notes(stage, notes)
